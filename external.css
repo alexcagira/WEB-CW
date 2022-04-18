@@ -12,16 +12,33 @@ body {
     border: 6px solid rgb(6, 20, 39);
     margin: 20px;
     padding: 0px;
+    float: left;
 
 }
 image-subtitle{
-    color: rgb(48, 28, 161);
+    color: rgb(249, 243, 243);
     font-weight: 625;
     text-align: center;
     padding: 2px;
     font-size: 20px;
 }
-h1 {background-color:rgb(207, 131, 16); color:rgb(228, 231, 17)}
+.row::after{
+    content: " ";
+    clear: both;
+    display: table;
+}
+h1 {
+    background-color:rgb(207, 131, 16); color:rgb(228, 231, 17);
+    text-align: center;
+}
 nav {background-color:rgb(138, 190, 40); color:teal}
-p {background-color: blueviolet;}
-footer {background-color: darkgreen;}
+p {
+    background-color: blueviolet;
+    position: absolute;
+    bottom: 5px; left: 450px;
+}
+footer {
+    background-color: darkgreen;
+    position: absolute;
+    bottom: 0px; left: 550px;
+}
