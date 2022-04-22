@@ -1,157 +1,222 @@
-(function(){
-    // Functions
-    function buildQuiz(){
-      // variable to store the HTML output
-      const output = [];
-  
-      // for each question...
-      myQuestions.forEach(
-        (currentQuestion, questionNumber) => {
-  
-          // variable to store the list of possible answers
-          const answers = [];
-  
-          // and for each available answer...
-          for(letter in currentQuestion.answers){
-  
-            // ...add an HTML radio button
-            answers.push(
-              `<label>
-                <input type="radio" name="question${questionNumber}" value="${letter}">
-                ${letter} :
-                ${currentQuestion.answers[letter]}
-              </label>`
-            );
-          }
-  
-          // add this question and its answers to the output
-          output.push(
-            `<div class="slide">
-              <div class="answers"> ${answers.join("")} </div>
-            </div>`
-          );
-        }
-      );
-  
-      // finally combine our output list into one string of HTML and put it on the page
-      quizContainer.innerHTML = output.join('');
-    }
-  
-    function showResults(){
-  
-      // gather answer containers from our quiz
-      const answerContainers = quizContainer.querySelectorAll('.answers');
-  
-      // keep track of user's answers
-      let numCorrect = 0;
-  
-      // for each question...
-      myQuestions.forEach( (currentQuestion, questionNumber) => {
-  
-        // find selected answer
-        const answerContainer = answerContainers[questionNumber];
-        const selector = `input[name=question${questionNumber}]:checked`;
-        const userAnswer = (answerContainer.querySelector(selector) || {}).value;
-  
-        // if answer is correct
-        if(userAnswer === currentQuestion.correctAnswer){
-          // add to the number of correct answers
-          numCorrect++;
-  
-          // color the answers green
-          answerContainers[questionNumber].style.color = 'lightgreen';
-        }
-        // if answer is wrong or blank
-        else{
-          // color the answers red
-          answerContainers[questionNumber].style.color = 'red';
-        }
-      });
-  
-      // show number of correct answers out of total
-      resultsContainer.innerHTML = `${numCorrect} out of ${myQuestions.length}`;
-    }
-  
-    function showSlide(n) {
-      slides[currentSlide].classList.remove('active-slide');
-      slides[n].classList.add('active-slide');
-      currentSlide = n;
-      if(currentSlide === 0){
-        previousButton.style.display = 'none';
-      }
-      else{
-        previousButton.style.display = 'inline-block';
-      }
-      if(currentSlide === slides.length-1){
-        nextButton.style.display = 'none';
-        submitButton.style.display = 'inline-block';
-      }
-      else{
-        nextButton.style.display = 'inline-block';
-        submitButton.style.display = 'none';
-      }
-    }
-  
-    function showNextSlide() {
-      showSlide(currentSlide + 1);
-    }
-  
-    function showPreviousSlide() {
-      showSlide(currentSlide - 1);
-    }
-    
-  
-    // Variables
-    const quizContainer = document.getElementById('quiz');
-    const resultsContainer = document.getElementById('results');
-    const submitButton = document.getElementById('submit');
+var position = 0,
+  quiz, quiz_status, question, audio, choice, choices, chA, chB, chC, chD, correct = 0;
 
-    const myQuestions = [
-      {
-        answers: {
-          a: "Titanic",
-          b: "Love Actually",
-          c: "Eternal Sunshine of the Spotless Mind",
-          d: "Moulin Rouge"
-        },
-        correctAnswer: "c"
-      },
-      {
-        answers: {
-          a: "Love, Simon",
-          b: "Twilight",
-          c: "The fall of our stars",
-          d: "Not another teeanger movie"
+var questions = [
+  { //Question 1
+  a: "Love Actually",
+  b: "Titanic",
+  c: "Romeo + Juliet",
+  d: "Moulin Rouge",
+  answer: "d",
+  img: "https://film-grab.com/wp-content/uploads/2016/12/moulinrouge062.jpg"
+  },
 
-        },
-        correctAnswer: "c"
-      },
-      {
-        answers: {
-          a: "Amelie",
-          b: "Contact",
-          c: "Me before you",
-          d: "50 first dates"
-        },
-        correctAnswer: "d"
-      }
-    ];
+  { //Question 2
+    a: "The fault in our stars",
+    b: "The Notebook",
+    c: "Her",
+    d: "Me before you",
+    answer: "a",
+    img: "https://variety.com/wp-content/uploads/2014/05/fault-in-our-stars.jpg"
+  },
+
+  { //Question 3
+    a: "Call me by your name",
+    b: "La La Land",
+    c: "The curious case of Benjamin Button",
+    d: "P.S. I love you",
+    answer: "b",
+    img: "https://film-grab.com/wp-content/uploads/2019/03/lalal020.jpg"
+  },
+
+  { //Question 4
+    question: "<h2>'Even the smallest person can change the course of the future.'</h2>",
+    a: "Galadriel",
+    b: "Gandalf",
+    c: "Arwen",
+    d: "Aragorn",
+    answer: "a",
+    audio: "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
+
+  },
+
+  { //Question 5
+    question: "<h2>'Even the smallest person can change the course of the future.'</h2>",
+    a: "Galadriel",
+    b: "Gandalf",
+    c: "Arwen",
+    d: "Aragorn",
+    answer: "a",
+    audio: "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
+
+  },
+
+  { //Question 6
+    question: "<h2>'Even the smallest person can change the course of the future.'</h2>",
+    a: "Galadriel",
+    b: "Gandalf",
+    c: "Arwen",
+    d: "Aragorn",
+    answer: "a",
+    img: "",
+    audio: "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
+
+  },
+
+  { //Question 7
+    question: "<h2>'Even the smallest person can change the course of the future.'</h2>",
+    a: "https://variety.com/wp-content/uploads/2014/05/fault-in-our-stars.jpg",
+    b: "https://film-grab.com/wp-content/uploads/2019/03/lalal020.jpg",
+    c: "Arwen",
+    d: "Aragorn",
+    answer: "a",
+    audio: "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
+
+  },
+
+  { //Question 8
+    question: "<h2>'Even the smallest person can change the course of the future.'</h2>",
+    a: "Galadriel",
+    b: "Gandalf",
+    c: "Arwen",
+    d: "Aragorn",
+    answer: "a",
+    img: "",
+    audio: "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
+
+  },
+
+  { //Question 9
+    question: "<h2>'Even the smallest person can change the course of the future.'</h2>",
+    a: "Galadriel",
+    b: "Gandalf",
+    c: "Arwen",
+    d: "Aragorn",
+    answer: "a",
+    img: "",
+    audio: "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3"
+
+  }];
+
+
+function get(x) {
+  return document.getElementById(x);
+}
+
+function play() {
+  audio = document.getElementById("audio");
+  audio.play();
+}
+
+function renderQuestion() {
+  quiz = get("quiz");
+  if (position >= questions.length) {
+
+    quiz.innerHTML = "<h2>You got " + correct + " of " + questions.length + " questions correct</h2>";
+
+    if(correct == 0){
+      quiz.innerHTML += "<h2> YOU HAVE NO CINEMATIC CULTURE </h2>";
+    } //if ZERO questions are correct
   
-    // Kick things off
-    buildQuiz();
+    if(correct >= 1 && correct >! 5){
+      quiz.innerHTML += "<h2> YOU ARE AN CASUAL VIEWER </h2>";
+    } //if ONE question is correct
+
+    if(correct > 5 && correct >! 8){
+      quiz.innerHTML += "<h2> YOU ARE AN AVERAGE VIEWER </h2>";
+    } //if TWO questions are correct
+
+    if(correct == 9){
+      quiz.innerHTML += "<h2> YOU ARE A CINEMA LOVER </h2>";
+    } //if THREE questions are correct
+
+    get("quiz_status").innerHTML = "Quiz completed";
+    //reset everything for the next quiz
+    position = 0;
+    correct = 0;
+
+    quiz.innerHTML += "<button onclick='goHome()'>BACK HOME</button>";
+
+    return false;
+  }
+  get("quiz_status").innerHTML = "Question " + (position + 1) + " of " + questions.length;
+
+  question = questions[position].question;
+  chA = questions[position].a;
+  chB = questions[position].b;
+  chC = questions[position].c;
+  chD = questions[position].d;
+  //Add local var to hold url
+  img = questions[position].img;
+  audio = questions[position].audio;
+
+  quiz.innerHTML = "<h3></h3>";
+
+  if(position <=2 ){
+    quiz.innerHTML += "<h1>GUESS THE FRAME</h1>";
+  //Add <img> element to DOM with source
+    quiz.innerHTML += "<img class='pretty-image' src=\"" + img + "\"><br>";
+    quiz.innerHTML += "<label> <input type='radio' class='pretty-choice' name='choices' value='a'> " + chA + "</label>";
+    quiz.innerHTML += "<label> <input type='radio' class='pretty-choice' name='choices' value='b'> " + chB + "</label>";
+    quiz.innerHTML += "<label> <input type='radio' class='pretty-choice' name='choices' value='c'> " + chC + "</label>";
+    quiz.innerHTML += "<label> <input type='radio' class='pretty-choice' name='choices' value='d'> " + chD + "</label><br>";
+  } 
   
-    // Pagination
-    const previousButton = document.getElementById("previous");
-    const nextButton = document.getElementById("next");
-    const slides = document.querySelectorAll(".slide");
-    let currentSlide = 0;
-  
-    // Show the first slide
-    showSlide(currentSlide);
-  
-    // Event listeners
-    submitButton.addEventListener('click', showResults);
-    previousButton.addEventListener("click", showPreviousSlide);
-    nextButton.addEventListener("click", showNextSlide);
-  })();
-  
+  if(position >= 3 && position <= 5){
+    quiz.innerHTML += "<h1>GUESS WHO SAID THE QUOTE</h1>";
+    quiz.innerHTML += "<label><audio controls><source src=" + audio + " type='audio/mpeg'></audio></label>";
+    quiz.innerHTML += "<h3>" + question + "</h3>"
+    quiz.innerHTML += "<label> <input type='radio' class='pretty-choice' name='choices' value='a'> " + chA + "</label>";
+    quiz.innerHTML += "<label> <input type='radio' class='pretty-choice' name='choices' value='b'> " + chB + "</label>";
+    quiz.innerHTML += "<label> <input type='radio' class='pretty-choice' name='choices' value='c'> " + chC + "</label>";
+    quiz.innerHTML += "<label> <input type='radio' class='pretty-choice' name='choices' value='d'> " + chD + "</label><br>";
+
+  }
+
+  if(position >= 6){
+    quiz.innerHTML += "<h1>GUESS THE SOUNDTRACK</h1>";
+    quiz.innerHTML += "<label><audio controls><source src=" + audio + " type='audio/mpeg'></audio></label></br>";
+    quiz.innerHTML += "<label><input type='radio' name='choices' value='a'><img class='icons' src=" + chA + "></label>";
+    quiz.innerHTML += "<label><input type='radio' name='choices' value='b'><img class='icons' src=" + chB + "></label>";
+    quiz.innerHTML += "<label><input type='radio' name='choices' value='b'><img class='icons' src=" + chC + "></label>";
+    quiz.innerHTML += "<label><input type='radio' name='choices' value='b'><img class='icons' src=" + chD + "></label><br>";
+  }
+  quiz.innerHTML += "<button onclick='showPrevious()'>&#8678 Question</button>";
+  quiz.innerHTML += "<button onclick='checkAnswer()'>Submit Answer</button>";
+  quiz.innerHTML += "<button onclick='showNext()'>Question &#8680</button>";
+}
+
+function checkAnswer() {
+  choices = document.getElementsByName("choices");
+  for (var i = 0; i < choices.length; i++) {
+    if (choices[i].checked) {
+      choice = choices[i].value;
+    }
+  }
+
+  if (choice == questions[position].answer) {
+    correct++;
+  }
+
+  position++;
+
+  renderQuestion();
+}
+
+//Show next question
+function showNext() {
+  position++;
+  renderQuestion();
+}
+//Show previous question
+function showPrevious() {
+  position--;
+  renderQuestion();
+}
+
+//Go back to the main page
+function goHome(){
+  document.location.href="/Users/alex/Desktop/Web Tech/WEB CW/quizselector.html";
+}
+
+window.addEventListener("load", renderQuestion);
